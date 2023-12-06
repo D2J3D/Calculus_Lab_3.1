@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 import time
 
 
@@ -8,16 +7,22 @@ def z_fun(x, y):
     return x ** 2 + y ** 2 - x ** 3 - y ** 3 + 2 * x * y
 
 
-def draw_function(function):
-    samples = np.arange(0, 10, 0.1)
+def draw_function_with_approximation(function, xk, yk):
+    # ограничения на x и y ([-2, 10])
+    samples = np.arange(-2, 10, 0.1)
     x, y = np.meshgrid(samples, samples)
+    # координатная сетка
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
-    ax.plot_surface(x, y, function(x, y))
+    ax.plot_surface(x, y, function(x, y), alpha=0.5, label='график функции z(x,y)') # строим поверхность, задаваемую функцией z(x, y)
+    # добавляем точки, по которым алгоритм шел к точке локального максимума (4/3, 4/3)
+    zk = [function(xk[i], yk[i]) for i in range(len(xk))]
+    ax.scatter(xk, yk, zk, c='red', label='поиск экстремума функции')
+
     ax.set_zlim(0, 9)
     plt.xlabel("x")
     plt.ylabel("y")
-    plt.legend()
+    ax.legend()
     plt.show()
 
 
@@ -67,10 +72,6 @@ if __name__ == '__main__':
     print(f"Точка экстремума (x,y) = {round(answer[0][0][-1], 3), round(answer[0][1][-1], 3)}")
     print(f"Количество итераций: {answer[1]}")
     print(f"Время работы программы: {answer[-1]}с")
-    print(norm(normalize_vector([1/np.sqrt(2), np.sqrt(3)/2, -1])))
 
     # построим график путешествий в поисках экстремума
-    extremum_approximation = answer[0]
-    extremum_approximation_by_x = extremum_approximation[0]  # подходим к точке экстремума по таким x
-    extremum_approximation_by_y = extremum_approximation[1]  # и по таким y
-
+    draw_function_with_approximation(z_fun, answer[0][0], answer[0][1])
